@@ -73,3 +73,34 @@ void point2dTo3d(cv::Mat depthImage,
     point3d[0] = (n - camera.cx) * point3d[2] / camera.fx;
     point3d[1] = (m - camera.cy) * point3d[2] / camera.fy;
 }
+
+
+
+////////////////////////////////////////////////////////////
+/// \brief point2dTo3d
+/// \param camera
+/// \param point2d
+/// \param depth
+/// \param point3d
+///
+void point2dTo3d(camera_intrinsic_parameters& camera,
+                 const unsigned *point2d,
+                 double depth,
+                 double *point3d)
+{
+    unsigned m = point2d[0];
+    unsigned n = point2d[1];
+    // d 可能没有值，若如此，跳过此点
+    if (depth == 0)
+    {
+        point3d[0] = 0.0;
+        point3d[1] = 0.0;
+        point3d[2] = 0.0;
+        return;
+    }
+
+    // 计算这个点的空间坐标
+    point3d[2] = double(depth) / camera.scale;
+    point3d[0] = (n - camera.cx) * point3d[2] / camera.fx;
+    point3d[1] = (m - camera.cy) * point3d[2] / camera.fy;
+}

@@ -5,12 +5,6 @@
 
 #include <opencv2/core/core.hpp>
 
-const double camera_factor = 1000.0;
-const double camera_cx = 325.5;
-const double camera_cy = 253.5;
-const double camera_fx = 518.0;
-const double camera_fy = 519.0;
-
 ////////////////////////////////////////////////////////////
 /// \brief point2dTo3d
 /// convert 2d point in an rgb-d input to a 3d point with color information
@@ -28,6 +22,7 @@ void point2dTo3d(cv::Mat rgbImage,
                  const unsigned *point2d,
                  double *point3d);
 
+
 ////////////////////////////////////////////////////////////
 /// \brief point2dTo3d
 /// get 3d point position for the 2d query point in a depth image
@@ -38,5 +33,18 @@ void point2dTo3d(cv::Mat rgbImage,
 void point2dTo3d(cv::Mat depthImage,
                  camera_intrinsic_parameters& camera,
                  const unsigned *point2d,
+                 double *point3d);
+
+
+////////////////////////////////////////////////////////////
+/// \brief point2dTo3d
+/// \param camera
+/// \param point2d
+/// \param depth
+/// \param point3d
+///
+void point2dTo3d(camera_intrinsic_parameters& camera,
+                 const unsigned *point2d,
+                 double depth,
                  double *point3d);
 #endif // POINT2DTO3D_H
