@@ -1,7 +1,6 @@
 #include <iostream>
 
-#include "commonDefinitions.h"
-#include "generatePointCloud.h"
+#include "slambase.h"
 
 #include <pcl/io/pcd_io.h>
 
