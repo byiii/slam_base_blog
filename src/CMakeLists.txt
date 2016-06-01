@@ -7,6 +7,9 @@ set(SLAM_BASE_FILES slambase.cpp
                     configparameters.cpp
                     point2dTo3d.cpp
                     commonDefinitions.cpp
-                    generatePointCloud.cpp)
+                    generatePointCloud.cpp
+                    featureExtraction.cpp
+                    featureMatching.cpp
+                    transformationEstimation.cpp)
 add_library(slam_base ${SLAM_BASE_FILES})
 target_link_libraries(slam_base ${OpenCV_LIBS} ${PCL_LIBRARIES})
