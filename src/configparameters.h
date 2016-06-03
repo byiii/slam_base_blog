@@ -3,6 +3,8 @@
 
 #include "slamparameters.h"
 
+#include <libconfig.h++>
+
 /// use libconfig to convey the user configure file to the slamParameters
 /// parameters
 class configParameters
