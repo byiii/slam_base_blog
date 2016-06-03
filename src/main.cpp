@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "slambase.h"
+#include "slamparameters.h"
 
 #include <pcl/io/pcd_io.h>
 
@@ -11,6 +12,16 @@ const double camera_fx = 518.0;
 const double camera_fy = 519.0;
 
 int main(int argc, char ** argv)
+{
+    slamParameters param;
+
+    param.configure("../config/parameters.cfg");
+    param.displayParameters();
+
+    return 0;
+}
+
+int main_tutorial3(int argc, char ** argv)
 {
     using namespace std;
 

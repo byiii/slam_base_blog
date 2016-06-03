@@ -56,23 +56,25 @@ int slamParameters::configure(const char *configFile)
         // (k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6]]) of 4, 5, or 8 elements.
         camera_distCoeffs.clear(); // clear original data first
         camera_distCoeffs.resize(8);
+        for(size_t i=0; i<camera_distCoeffs.size(); ++i)
+            camera_distCoeffs[i] = 0.0;
         const libconfig::Setting& camera_dist = root["camera_distortion"];
-        if(camera_dist.exists("k_1"))
-            camera_dist.lookupValue("k_1", camera_distCoeffs[0]);
-        if(camera_dist.exists("k_2"))
-            camera_dist.lookupValue("k_2", camera_distCoeffs[1]);
-        if(camera_dist.exists("p_1"))
-            camera_dist.lookupValue("p_1", camera_distCoeffs[2]);
-        if(camera_dist.exists("p_2"))
-            camera_dist.lookupValue("p_2", camera_distCoeffs[3]);
-        if(camera_dist.exists("k_3"))
-            camera_dist.lookupValue("k_3", camera_distCoeffs[4]);
-        if(camera_dist.exists("k_4"))
-            camera_dist.lookupValue("k_4", camera_distCoeffs[5]);
-        if(camera_dist.exists("k_5"))
-            camera_dist.lookupValue("k_5", camera_distCoeffs[6]);
-        if(camera_dist.exists("k_6"))
-            camera_dist.lookupValue("k_6", camera_distCoeffs[7]);
+        if(camera_dist.exists("k1"))
+            camera_dist.lookupValue("k1", camera_distCoeffs[0]);
+        if(camera_dist.exists("k2"))
+            camera_dist.lookupValue("k2", camera_distCoeffs[1]);
+        if(camera_dist.exists("p1"))
+            camera_dist.lookupValue("p1", camera_distCoeffs[2]);
+        if(camera_dist.exists("p2"))
+            camera_dist.lookupValue("p2", camera_distCoeffs[3]);
+        if(camera_dist.exists("k3"))
+            camera_dist.lookupValue("k3", camera_distCoeffs[4]);
+        if(camera_dist.exists("k4"))
+            camera_dist.lookupValue("k4", camera_distCoeffs[5]);
+        if(camera_dist.exists("k5"))
+            camera_dist.lookupValue("k5", camera_distCoeffs[6]);
+        if(camera_dist.exists("k6"))
+            camera_dist.lookupValue("k6", camera_distCoeffs[7]);
 
         // configure feature matching parameters
         const libconfig::Setting& match = root["match"];
@@ -102,16 +104,19 @@ void slamParameters::displayParameters()
     cout << "cy: " << camera_cy << endl;
     cout << "fx: " << camera_fx << endl;
     cout << "fy: " << camera_fy << endl;
+    cout << endl;
     cout << "# camera distortion coefficients #" << endl;
     for(size_t i=0; i<camera_distCoeffs.size(); ++i)
         cout << camera_distCoeffs[i] << ", ";
     cout << endl;
-    cout << "# feature matching #" << endl;
-    cout << " good match threshold: " << match_goodMatchThreshold << endl;
-    cout << "# pnp ransac #" << endl;
-    cout << ransac_iterationsCount << endl;
-    cout << ransac_reprojectionError << endl;
-    cout << ransac_minInliersCount << endl;
-
     cout << endl;
+    cout << "# feature matching #" << endl;
+    cout << "good match threshold: " << match_goodMatchThreshold << endl;
+    cout << endl;
+    cout << "# pnp ransac #" << endl;
+    cout << "max_iteration: " << ransac_iterationsCount << endl;
+    cout << "reprojection error: " << ransac_reprojectionError << endl;
+    cout << "min inliers: " << ransac_minInliersCount << endl;
+
+    cout << endl << endl;
 }
