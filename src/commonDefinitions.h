@@ -73,4 +73,53 @@ struct ResultOfPNP
     int number_of_inliers;
 };
 
+class transformation
+{
+protected:
+    SixDegreeTransformation vector_form;
+    Eigen::Affine3f matrix_form;
+public:
+    transformation(const Eigen::Affine3f &affine)
+    {
+        matrix_form = affine;
+    }
+    transformation(const SixDegreeTransformation &s)
+    {
+        vector_form = s;
+    }
+
+    void getMatrix(Eigen::Affine3f &affine)
+    {
+        affine = matrix_form;
+    }
+
+    void getVectors(SixDegreeTransformation& s)
+    {
+        s = vector_form;
+    }
+protected:
+    void matrix_to_vector();
+    void vector_to_matrix();
+};
+
+
+#include <cfloat>
+#include <cmath>
+
+
+
+/// get the sign of a double
+inline double getSign(double x)
+{
+    if(fabs(x)>DBL_EPSILON)
+    {
+        if(x>0.0)
+            return 1.0;
+        else
+            return -1.0;
+    }
+    else
+        return 1.0;
+}
+
 #endif // COMMON_DEFINITIONS_H
