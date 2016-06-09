@@ -12,6 +12,7 @@
 #include "transformationEstimation.h"
 
 #include "frame.h"
+#include "pointCloudFusion.h"
 #include "visualizer.h"
 
 class slamBase

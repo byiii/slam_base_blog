@@ -1,7 +1,6 @@
 #include <iostream>
 
 #include "slambase.h"
-#include "slamparameters.h"
 
 #include <pcl/io/pcd_io.h>
 
@@ -59,11 +58,74 @@ int main( int argc, char** argv )
 
     cout<<"solving pnp"<<endl;
     // 求解pnp
-    ResultOfPNP result;
-    estimateMotionFrameToFrame(frame1, frame2, result);
+    Eigen::Affine3f affine;
+    estimateMotion_3dTo3d(frame2, frame1, affine);  // align frame2 to frame1
 
-    cout << "rotation: " << result.transformation.rotation_vector << endl
-         << "translation: " << result.transformation.translate_vector << endl;
+    // 转换点云
+    cout<< "converting image to clouds" << endl;
+    PointCloudT_Ptr cloud1 = frame1.getPointCloud();
+    PointCloudT_Ptr cloud2 = frame2.getPointCloud();
+
+    // 合并点云
+    cout<<"combining clouds"<<endl;
+    PointCloudT_Ptr output (new pcl::PointCloud<PointT>());
+    fusingPointCloud(*cloud1, *cloud2, *output, affine);
+
+    pcl::io::savePCDFile("../data/result.pcd", *output);
+    cout<<"Final result saved."<<endl;
+
+    visualizer_simple viewer("view");
+    viewer.showPointCloud(output);
+}
+
+
+int main_tutorial4_a( int argc, char** argv )
+{
+    using std::cout;
+    using std::endl;
+
+    //本节要拼合data中的两对图像
+    slamParameters param;
+    param.configure("../config/parameters.cfg");
+
+    // camera model
+    camera_intrinsic_parameters camera;
+    camera.cx = param.camera_cx;
+    camera.cy = param.camera_cy;
+    camera.fx = param.camera_fx;
+    camera.fy = param.camera_fy;
+    camera.scale = param.camera_factor;
+
+    frame::parameters frame_param;
+    frame_param.descriptor_type = "SIFT";
+    frame_param.detector_type = "SIFT";
+
+    //读取图像
+    // 声明并从data文件夹里读取两个rgb与深度图
+    cv::Mat rgb1 = cv::imread( "../data/rgb1.png");
+    cv::Mat rgb2 = cv::imread( "../data/rgb2.png");
+    cv::Mat depth1 = cv::imread( "../data/depth1.png", -1);
+    cv::Mat depth2 = cv::imread( "../data/depth2.png", -1);
+
+    // 声明两个帧，FRAME结构请见include/slamBase.h
+    frame frame1(rgb1,depth1, camera);
+    frame1.setParameters(frame_param);
+    frame frame2(rgb2, depth2, camera);
+    frame2.setParameters(frame_param);
+
+    // compute point cloud
+    frame1.computePointCloud();
+    frame2.computePointCloud();
+
+    // 提取特征并计算描述子
+    cout<<"extracting features"<<endl;
+    frame1.computeKeypointsAndDescriptors();
+    frame2.computeKeypointsAndDescriptors();
+
+    cout<<"solving pnp"<<endl;
+    // 求解pnp
+    ResultOfPNP result;
+    estimateMotion_3dTo2d(frame1, frame2, result);
 
     // 处理result
     // 将旋转向量转化为旋转矩阵
@@ -86,20 +148,22 @@ int main( int argc, char** argv )
     T(2,3) = result.transformation.translate_vector.at<double>(0,2);
 
     // 转换点云
-    cout<<"converting image to clouds"<<endl;
-    frame::PointCloudT_Ptr cloud1 = frame1.getPointCloud();
-    frame::PointCloudT_Ptr cloud2 = frame2.getPointCloud();
+    cout<< "converting image to clouds" << endl;
+    PointCloudT_Ptr cloud1 = frame1.getPointCloud();
+    PointCloudT_Ptr cloud2 = frame2.getPointCloud();
 
     // 合并点云
     cout<<"combining clouds"<<endl;
-    frame::PointCloudT_Ptr output (new pcl::PointCloud<frame::PointT>());
-    pcl::transformPointCloud( *cloud2, *output, T.matrix() );
-    *output += *cloud1;
+    PointCloudT_Ptr output (new pcl::PointCloud<PointT>());
+    pcl::transformPointCloud(*cloud1, *output, T.matrix());
+    *output += *cloud2;
     pcl::io::savePCDFile("../data/result.pcd", *output);
     cout<<"Final result saved."<<endl;
 
     visualizer_simple viewer("view");
     viewer.showPointCloud(output);
+
+    cout << T.matrix() << endl;
 }
 
 int main_param(int argc, char ** argv)
@@ -166,8 +230,8 @@ int main_tutorial3(int argc, char ** argv)
     cv::Mat translationVec;
     cv::Mat inliers;
 
-    transformationEstimation(depth1, kp1, kp2, camera, matches,
-                             rotationVec, translationVec, inliers);
+    transformationEstimation_3dTo2d(depth1, kp1, kp2, camera, matches,
+                                    rotationVec, translationVec, inliers);
 
     // 画出inliers匹配
     vector< cv::DMatch > matchesShow;

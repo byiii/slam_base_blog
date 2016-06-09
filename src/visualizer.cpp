@@ -3,7 +3,7 @@
 #include <pcl/visualization/pcl_visualizer.h>
 #include <boost/thread.hpp>
 
-void visualizer_simple::showPointCloud(pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pc)
+void visualizer_simple::showPointCloud(PointCloudT_Ptr pc)
 {
     pcl::visualization::PCLVisualizer viewer(name.c_str());
     viewer.setBackgroundColor(0.3, 0.4, 0.4);

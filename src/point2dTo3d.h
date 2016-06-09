@@ -3,6 +3,7 @@
 
 #include "commonDefinitions.h"
 
+#include <Eigen/Dense>
 #include <opencv2/core/core.hpp>
 
 ////////////////////////////////////////////////////////////
@@ -18,7 +19,7 @@
 ///
 void point2dTo3d(cv::Mat rgbImage,
                  cv::Mat depthImage,
-                 camera_intrinsic_parameters& camera,
+                 const camera_intrinsic_parameters& camera,
                  const unsigned *point2d,
                  double *point3d);
 
@@ -31,7 +32,7 @@ void point2dTo3d(cv::Mat rgbImage,
 /// \param point3d: [x,y,z]
 ///
 void point2dTo3d(cv::Mat depthImage,
-                 camera_intrinsic_parameters& camera,
+                 const camera_intrinsic_parameters& camera,
                  const unsigned *point2d,
                  double *point3d);
 
@@ -43,8 +44,30 @@ void point2dTo3d(cv::Mat depthImage,
 /// \param depth
 /// \param point3d
 ///
-void point2dTo3d(camera_intrinsic_parameters& camera,
+void point2dTo3d(const camera_intrinsic_parameters& camera,
                  const unsigned *point2d,
                  double depth,
                  double *point3d);
+
+
+////////////////////////////////////////////////////////////
+/// \brief point2dTo3d
+/// \param input
+/// \param output
+/// \param camera
+///
+void point2dTo3d(const cv::Point3f &input,
+                 cv::Point3f &output,
+                 const camera_intrinsic_parameters& camera);
+
+////////////////////////////////////////////////////////////
+/// \brief point2dTo3d
+/// \param input
+/// \param output
+/// \param camera
+///
+void point2dTo3d(Eigen::Vector3f &input,
+                 Eigen::Vector3f &output,
+                 const camera_intrinsic_parameters& camera);
+
 #endif // POINT2DTO3D_H

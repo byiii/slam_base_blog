@@ -5,6 +5,7 @@ target_link_libraries(main
 
 
 set(SLAM_BASE_FILES slambase.cpp
+                    pointCloudFusion.cpp
                     visualizer.cpp
                     frame.cpp
                     slamparameters.cpp

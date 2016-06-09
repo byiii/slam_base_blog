@@ -10,10 +10,6 @@
 class frame
 {
 public:
-    typedef pcl::PointXYZRGBA PointT;
-    typedef pcl::PointCloud<pcl::PointXYZRGBA> PointCloudT;
-    typedef pcl::PointCloud<pcl::PointXYZRGBA>::Ptr PointCloudT_Ptr;
-
     struct parameters
     {
         std::string descriptor_type;
@@ -32,6 +28,7 @@ protected:
     cv::Mat descriptors;
     std::vector<cv::KeyPoint> keypoints;
     SixDegreeTransformation transformationToRF;
+    Eigen::Affine3f affine_transformation;
 
     PointCloudT_Ptr pointCloud;
 
@@ -52,6 +49,15 @@ public:
         camera = in_camera;
     }
 
+    frame& operator=(const frame &another_frame)
+    {
+        another_frame.rgb.copyTo(this->rgb);
+        another_frame.depth.copyTo(this->depth);
+        this->camera = another_frame.camera;
+
+        return *this;
+    }
+
     ~frame()
     {
         this->release();
@@ -68,37 +74,46 @@ public:
         return this->pointCloud;
     }
 
-    friend void estimateMotionFrameToFrame(frame& frame1,
-                                           frame& frame2,
-                                           ResultOfPNP& result,
-                                           camera_intrinsic_parameters &camera);
+    friend void estimateMotion_3dTo2d(frame &frame1,
+                                      frame &frame2,
+                                      ResultOfPNP &result,
+                                      camera_intrinsic_parameters &camera);
 
-    friend void estimateMotionFrameToFrame(frame& frame1,
-                                           frame& frame2,
-                                           ResultOfPNP& result);
+    friend void estimateMotion_3dTo2d(frame &frame1,
+                                      frame &frame2,
+                                      ResultOfPNP &result);
+
+    friend void estimateMotion_3dTo3d(frame &frame1,
+                                      frame &frame2,
+                                      Eigen::Affine3f &affine);
 };
 
+////////////////////////////////////////////////////////////
+void generateAFrame(frame &aframe,
+                    const char* colorFile,
+                    const char* depthFile,
+                    const camera_intrinsic_parameters& camera);
 
 ////////////////////////////////////////////////////////////
-/// \brief estimationMotionFrameToFrame
-/// \param frame1
-/// \param frame2
-/// \param result
-/// \param camera
-///
-void estimateMotionFrameToFrame(frame& frame1,
-                                frame& frame2,
-                                ResultOfPNP& result,
-                                camera_intrinsic_parameters &camera);
+void estimateMotion_3dTo2d(frame &frame1,
+                           frame &frame2,
+                           ResultOfPNP &result,
+                           camera_intrinsic_parameters &camera);
 
 ////////////////////////////////////////////////////////////
-/// \brief estimationMotionFrameToFrame
+void estimateMotion_3dTo2d(frame &frame1,
+                           frame &frame2,
+                           ResultOfPNP& result);
+
+////////////////////////////////////////////////////////////
+/// \brief estimateMotion_3dTo3d
+/// align frame1 to frame2
 /// \param frame1
 /// \param frame2
-/// \param camera
+/// \param affine
 ///
-void estimateMotionFrameToFrame(frame& frame1,
-                                frame& frame2,
-                                ResultOfPNP& result);
+void estimateMotion_3dTo3d(frame &frame1,
+                           frame &frame2,
+                           Eigen::Affine3f &affine);
 
 #endif // FRAME_H

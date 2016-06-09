@@ -2,8 +2,7 @@
 #define VISUALIZER_H
 
 #include <string>
-#include <pcl/point_cloud.h>
-#include <pcl/point_types.h>
+#include "commonDefinitions.h"
 
 class visualizer_simple
 {
@@ -15,7 +14,7 @@ public:
         name = str;
     }
 
-    void showPointCloud(pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pc);
+    void showPointCloud(PointCloudT_Ptr pc);
 };
 
 #endif // VISUALIZER_H

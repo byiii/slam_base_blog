@@ -13,7 +13,7 @@
 ///
 void point2dTo3d(cv::Mat rgbImage,
                  cv::Mat depthImage,
-                 camera_intrinsic_parameters& camera,
+                 const camera_intrinsic_parameters& camera,
                  const unsigned *point2d,
                  double *point3d)
 {
@@ -51,7 +51,7 @@ void point2dTo3d(cv::Mat rgbImage,
 /// \param point3d: [x,y,z]
 ///
 void point2dTo3d(cv::Mat depthImage,
-                 camera_intrinsic_parameters& camera,
+                 const camera_intrinsic_parameters& camera,
                  const unsigned *point2d,
                  double *point3d)
 {
@@ -83,7 +83,7 @@ void point2dTo3d(cv::Mat depthImage,
 /// \param depth
 /// \param point3d
 ///
-void point2dTo3d(camera_intrinsic_parameters& camera,
+void point2dTo3d(const camera_intrinsic_parameters& camera,
                  const unsigned *point2d,
                  double depth,
                  double *point3d)
@@ -103,4 +103,40 @@ void point2dTo3d(camera_intrinsic_parameters& camera,
     point3d[2] = double(depth) / camera.scale;
     point3d[0] = (n - camera.cx) * point3d[2] / camera.fx;
     point3d[1] = (m - camera.cy) * point3d[2] / camera.fy;
+}
+
+
+////////////////////////////////////////////////////////////
+/// \brief point2dTo3d
+/// \param input
+/// \param output
+/// \param camera
+///
+void point2dTo3d(const cv::Point3f &input,
+                 cv::Point3f &output,
+                 const camera_intrinsic_parameters& camera)
+{
+    output.z = double( input.z ) / camera.scale;
+    output.x = ( input.x - camera.cx) * output.z / camera.fx;
+    output.y = ( input.y - camera.cy) * output.z / camera.fy;
+    return;
+}
+
+////////////////////////////////////////////////////////////
+/// \brief point2dTo3d
+/// \param input
+/// \param output
+/// \param camera
+///
+void point2dTo3d(Eigen::Vector3f &input,
+                 Eigen::Vector3f &output,
+                 const camera_intrinsic_parameters& camera)
+{
+    float x, y, z;
+    z = double( input(2) ) / camera.scale;
+    x = ( input(0) - camera.cx) * z / camera.fx;
+    y = ( input(1) - camera.cy) * z / camera.fy;
+    output = Eigen::Vector3f(x,y,z);
+
+    return;
 }
