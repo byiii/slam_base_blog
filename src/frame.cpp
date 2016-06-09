@@ -22,7 +22,7 @@ void frame::release()
     pointCloud->points.clear();
     pointCloud->clear();
 
-    transformationToRF.release();
+    poseInVectors.release();
 }
 
 
@@ -57,17 +57,6 @@ void frame::setParameters(const parameters p)
     param.detector_type = p.detector_type;
 
     return;
-}
-
-////////////////////////////////////////////////////////////
-void generateAFrame(frame &aframe,
-                    const char* colorFile,
-                    const char* depthFile,
-                    const camera_intrinsic_parameters& camera)
-{
-    cv::Mat rgb = cv::imread( colorFile);
-    cv::Mat depth = cv::imread(depthFile, -1);
-    aframe = frame(rgb, depth, camera);
 }
 
 ////////////////////////////////////////////////////////////

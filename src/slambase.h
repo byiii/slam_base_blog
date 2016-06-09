@@ -13,6 +13,7 @@
 
 #include "frame.h"
 #include "pointCloudFusion.h"
+#include "rgbdSource.h"
 #include "visualizer.h"
 
 class slamBase

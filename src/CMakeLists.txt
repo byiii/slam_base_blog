@@ -5,6 +5,8 @@ target_link_libraries(main
 
 
 set(SLAM_BASE_FILES slambase.cpp
+                    rgbdSource.cpp
+                    visualOdometry.cpp
                     pointCloudFusion.cpp
                     visualizer.cpp
                     frame.cpp

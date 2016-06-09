@@ -23,12 +23,13 @@ public:
     };
 
 protected:
+    float generateTime;
     cv::Mat rgb;
     cv::Mat depth;
     cv::Mat descriptors;
     std::vector<cv::KeyPoint> keypoints;
-    SixDegreeTransformation transformationToRF;
-    Eigen::Affine3f affine_transformation;
+    SixDegreeTransformation poseInVectors;
+    Eigen::Affine3f pose;
 
     PointCloudT_Ptr pointCloud;
 
@@ -42,11 +43,15 @@ public:
 
     frame(const cv::Mat& in_rgb,
           const cv::Mat& in_depth,
-          const camera_intrinsic_parameters& in_camera)
+          const camera_intrinsic_parameters& in_camera,
+          float frame_time)
     {
+        generateTime = frame_time;
         in_rgb.copyTo(this->rgb);
         in_depth.copyTo(this->depth);
         camera = in_camera;
+
+        pointCloud.reset(new PointCloudT);
     }
 
     frame& operator=(const frame &another_frame)
@@ -54,6 +59,8 @@ public:
         another_frame.rgb.copyTo(this->rgb);
         another_frame.depth.copyTo(this->depth);
         this->camera = another_frame.camera;
+        this->generateTime = another_frame.generateTime;
+        pointCloud = another_frame.pointCloud->makeShared();
 
         return *this;
     }
@@ -73,6 +80,10 @@ public:
     {
         return this->pointCloud;
     }
+    PointCloudT_Ptr getPointCloudCopy()
+    {
+        return this->pointCloud->makeShared();
+    }
 
     friend void estimateMotion_3dTo2d(frame &frame1,
                                       frame &frame2,
@@ -87,12 +98,6 @@ public:
                                       frame &frame2,
                                       Eigen::Affine3f &affine);
 };
-
-////////////////////////////////////////////////////////////
-void generateAFrame(frame &aframe,
-                    const char* colorFile,
-                    const char* depthFile,
-                    const camera_intrinsic_parameters& camera);
 
 ////////////////////////////////////////////////////////////
 void estimateMotion_3dTo2d(frame &frame1,

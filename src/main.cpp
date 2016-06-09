@@ -13,7 +13,47 @@
 
 #include <pcl/common/transforms.h>
 
-int main( int argc, char** argv )
+int main(int argc, char** argv)
+{
+    using std::cout;
+    using std::endl;
+
+    //本节要拼合data中的两对图像
+    slamParameters param;
+    param.configure("../config/parameters.cfg");
+
+    // camera model
+    camera_intrinsic_parameters camera;
+    camera.cx = param.camera_cx;
+    camera.cy = param.camera_cy;
+    camera.fx = param.camera_fx;
+    camera.fy = param.camera_fy;
+    camera.scale = param.camera_factor;
+
+    frame::parameters frame_param;
+    frame_param.descriptor_type = "SIFT";
+    frame_param.detector_type = "SIFT";
+
+    fileSource source("../data");
+    source.setCamera(camera);
+    source.setStartFrameNumber(1);
+
+    frame frame1;
+    source.generateNewFrame(frame1);
+    frame1.computePointCloud();
+    frame frame2;
+    source.generateNewFrame(frame2);
+    frame2.computePointCloud();
+
+    PointCloudT_Ptr pc = frame2.getPointCloudCopy();
+    visualizer_simple viewer("view");
+    viewer.showPointCloud(pc);
+
+    return 0;
+}
+
+int main_tutorial4_( int argc, char** argv )
+//int main()
 {
     using std::cout;
     using std::endl;
@@ -42,9 +82,9 @@ int main( int argc, char** argv )
     cv::Mat depth2 = cv::imread( "../data/depth2.png", -1);
 
     // 声明两个帧，FRAME结构请见include/slamBase.h
-    frame frame1(rgb1,depth1, camera);
+    frame frame1(rgb1,depth1, camera, 0);
     frame1.setParameters(frame_param);
-    frame frame2(rgb2, depth2, camera);
+    frame frame2(rgb2, depth2, camera, 0);
     frame2.setParameters(frame_param);
 
     // compute point cloud
@@ -108,9 +148,9 @@ int main_tutorial4_a( int argc, char** argv )
     cv::Mat depth2 = cv::imread( "../data/depth2.png", -1);
 
     // 声明两个帧，FRAME结构请见include/slamBase.h
-    frame frame1(rgb1,depth1, camera);
+    frame frame1(rgb1,depth1, camera, 0);
     frame1.setParameters(frame_param);
-    frame frame2(rgb2, depth2, camera);
+    frame frame2(rgb2, depth2, camera, 0);
     frame2.setParameters(frame_param);
 
     // compute point cloud

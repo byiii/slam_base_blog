@@ -11,6 +11,7 @@ typedef pcl::PointXYZRGBA PointT;
 typedef pcl::PointCloud<PointT> PointCloudT;
 typedef PointCloudT::Ptr PointCloudT_Ptr;
 
+
 class camera_intrinsic_parameters
 {
 public:

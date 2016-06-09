@@ -4,6 +4,11 @@
 class visualOdometry
 {
 public:
+    struct parameters
+    {
+        int a;
+    };
+
     visualOdometry();
 };
 
