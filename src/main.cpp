@@ -5,13 +5,104 @@
 
 #include <pcl/io/pcd_io.h>
 
-const double camera_factor = 1000.0;
-const double camera_cx = 325.5;
-const double camera_cy = 253.5;
-const double camera_fx = 518.0;
-const double camera_fy = 519.0;
+// Eigen !
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 
-int main(int argc, char ** argv)
+#include <opencv2/calib3d/calib3d.hpp>
+#include <opencv2/core/eigen.hpp>
+
+#include <pcl/common/transforms.h>
+
+int main( int argc, char** argv )
+{
+    using std::cout;
+    using std::endl;
+
+    //本节要拼合data中的两对图像
+    slamParameters param;
+    param.configure("../config/parameters.cfg");
+
+    // camera model
+    camera_intrinsic_parameters camera;
+    camera.cx = param.camera_cx;
+    camera.cy = param.camera_cy;
+    camera.fx = param.camera_fx;
+    camera.fy = param.camera_fy;
+    camera.scale = param.camera_factor;
+
+    frame::parameters frame_param;
+    frame_param.descriptor_type = "SIFT";
+    frame_param.detector_type = "SIFT";
+
+    //读取图像
+    // 声明并从data文件夹里读取两个rgb与深度图
+    cv::Mat rgb1 = cv::imread( "../data/rgb1.png");
+    cv::Mat rgb2 = cv::imread( "../data/rgb2.png");
+    cv::Mat depth1 = cv::imread( "../data/depth1.png", -1);
+    cv::Mat depth2 = cv::imread( "../data/depth2.png", -1);
+
+    // 声明两个帧，FRAME结构请见include/slamBase.h
+    frame frame1(rgb1,depth1, camera);
+    frame1.setParameters(frame_param);
+    frame frame2(rgb2, depth2, camera);
+    frame2.setParameters(frame_param);
+
+    // compute point cloud
+    frame1.computePointCloud();
+    frame2.computePointCloud();
+
+    // 提取特征并计算描述子
+    cout<<"extracting features"<<endl;
+    frame1.computeKeypointsAndDescriptors();
+    frame2.computeKeypointsAndDescriptors();
+
+    cout<<"solving pnp"<<endl;
+    // 求解pnp
+    ResultOfPNP result;
+    estimateMotionFrameToFrame(frame1, frame2, result);
+
+    cout << "rotation: " << result.transformation.rotation_vector << endl
+         << "translation: " << result.transformation.translate_vector << endl;
+
+    // 处理result
+    // 将旋转向量转化为旋转矩阵
+    cv::Mat R;
+    cv::Rodrigues(result.transformation.rotation_vector, R);
+    Eigen::Matrix3d r;
+    cv::cv2eigen(R, r);
+
+    // 将平移向量和旋转矩阵转换成变换矩阵
+    Eigen::Isometry3d T = Eigen::Isometry3d::Identity();
+
+    Eigen::AngleAxisd angle(r);
+    cout<<"translation"<<endl;
+    Eigen::Translation<double,3> trans(result.transformation.translate_vector.at<double>(0,0),
+                                       result.transformation.translate_vector.at<double>(0,1),
+                                       result.transformation.translate_vector.at<double>(0,2));
+    T = angle;
+    T(0,3) = result.transformation.translate_vector.at<double>(0,0);
+    T(1,3) = result.transformation.translate_vector.at<double>(0,1);
+    T(2,3) = result.transformation.translate_vector.at<double>(0,2);
+
+    // 转换点云
+    cout<<"converting image to clouds"<<endl;
+    frame::PointCloudT_Ptr cloud1 = frame1.getPointCloud();
+    frame::PointCloudT_Ptr cloud2 = frame2.getPointCloud();
+
+    // 合并点云
+    cout<<"combining clouds"<<endl;
+    frame::PointCloudT_Ptr output (new pcl::PointCloud<frame::PointT>());
+    pcl::transformPointCloud( *cloud2, *output, T.matrix() );
+    *output += *cloud1;
+    pcl::io::savePCDFile("../data/result.pcd", *output);
+    cout<<"Final result saved."<<endl;
+
+    visualizer_simple viewer("view");
+    viewer.showPointCloud(output);
+}
+
+int main_param(int argc, char ** argv)
 {
     slamParameters param;
 
@@ -20,6 +111,13 @@ int main(int argc, char ** argv)
 
     return 0;
 }
+
+
+float camera_cx=325.5;
+float camera_cy=253.5;
+float camera_fx=518.0;
+float camera_fy=519.0;
+float camera_factor=1000.0;
 
 int main_tutorial3(int argc, char ** argv)
 {

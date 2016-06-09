@@ -35,7 +35,7 @@ void featureMatching(cv::Mat &descriptor1,
 
     for ( size_t i=0; i<matches.size(); i++ )
     {
-        if (matches[i].distance < 5*minDis)
+        if (matches[i].distance < 4*minDis)
             good_matches.push_back(matches[i]);
     }
 

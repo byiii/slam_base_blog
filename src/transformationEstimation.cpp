@@ -70,7 +70,7 @@ void transformationEstimation(cv::Mat &first_depth,
     // 求解pnp
     cv::solvePnPRansac( pts_obj, pts_img, cameraMatrix, cv::Mat(),
                         rotationVec, translationVec,
-                        true, 100, 5.0, 100, inliers );
+                        true, 100, 10.0, 100, inliers );
 
     cout << "inliers: " << inliers.rows << endl;
     cout << "R= " << rotationVec << endl;

@@ -16,4 +16,18 @@ void featureExtraction(cv::Mat &img,
                        std::vector<cv::KeyPoint> &keypoints,
                        cv::Mat &descriptors);
 
+////////////////////////////////////////////////////////////
+/// \brief featureExtraction
+/// \param img
+/// \param keypoints
+/// \param descriptors
+/// \param detector_type
+/// \param descriptor_type
+///
+int featureExtraction(cv::Mat &img,
+                       std::vector<cv::KeyPoint> &keypoints,
+                       cv::Mat &descriptors,
+                       const char* detector_type,
+                       const char* descriptor_type);
+
 #endif // FEATUREEXTRACTOR_H

@@ -5,6 +5,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/features2d/features2d.hpp>
 
+#include "frame.h"
+
 ////////////////////////////////////////////////////////////
 /// \brief transformationEstimation
 /// estimate the rigid 6-dof transformation bewteen to sequencial image
@@ -25,5 +27,7 @@ void transformationEstimation(cv::Mat &first_depth,
                               cv::Mat &rotationVec,
                               cv::Mat &translationVec,
                               cv::Mat &inliers);
+
+
 
 #endif // TRANSFORMATIONESTIMATION_H
