@@ -15,6 +15,7 @@
 #include "pointCloudFusion.h"
 #include "rgbdSource.h"
 #include "visualizer.h"
+#include "axis_angle.h"
 
 class slamBase
 {
