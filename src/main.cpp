@@ -36,7 +36,8 @@ int main(int argc, char** argv)
 
     fileSource source("../data");
     source.setCamera(camera);
-    source.setStartFrameNumber(1);
+    source.setStartIndex(1);
+    source.setEndIndex(2);
 
     frame frame1;
     source.generateNewFrame(frame1);
@@ -170,7 +171,7 @@ int main_tutorial4_a( int argc, char** argv )
     // 处理result
     // 将旋转向量转化为旋转矩阵
     Eigen::Matrix3f r;
-    eulerAnglesToRotationMatrix_XYZ(result.transformation.rotat_vec, r);
+    eulerAnglesToRotationMatrix_XYZ<float>(result.transformation.rotat_vec, r);
 
     // 将平移向量和旋转矩阵转换成变换矩阵
     Eigen::Isometry3f T = Eigen::Isometry3f::Identity();

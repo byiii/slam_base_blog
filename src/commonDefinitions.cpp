@@ -8,7 +8,7 @@ void SixDegreeTransformation::fromMatrix4f(Eigen::Matrix4f &mat)
     this->trans_vec(2) = mat(2,3);
 
     Eigen::Matrix3f rotmat = mat.block<3,3>(0,0);
-    rotationMatrixToEulerAngle_XYZ(rotmat, this->rotat_vec);
+    rotationMatrixToEulerAngle_XYZ<float>(rotmat, this->rotat_vec);
 }
 
 void SixDegreeTransformation::toMatrix4f(Eigen::Matrix4f &mat)

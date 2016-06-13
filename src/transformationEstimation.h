@@ -36,4 +36,9 @@ void transformationEstimation_3dTo3d(const cv::Mat &first_depth,
                                      const std::vector<cv::DMatch> &matches,
                                      Eigen::Affine3f &transformation);
 
+
+///
+/// TODO: add ransac based transformation estimation function with absolute orientation.
+///
+
 #endif // TRANSFORMATIONESTIMATION_H

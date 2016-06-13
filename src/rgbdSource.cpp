@@ -13,7 +13,7 @@ rgbdSource::rgbdSource()
 //------------------------------------------------------------
 int fileSource::generateNewFrame(frame &aframe)
 {
-    if(frame_count >= frame_end)
+    if(frame_count > frame_end)
     {
         std::cout << "\n----------------------------------------\n"
                      "last frame reached."
@@ -23,7 +23,7 @@ int fileSource::generateNewFrame(frame &aframe)
 
     char colorFile[30] = {0};
     char depthFile[30] = {0};
-    sprintf(colorFile, "%s/rgb%d.png", source_dir.c_str(), frame_count);
+    sprintf(colorFile, "%s/rgb%d.png", source_dir.c_str(), frame_start+frame_count);
     sprintf(depthFile, "%s/depth%d.png", source_dir.c_str(), frame_count);
 
     current_time += frame_time_interval;

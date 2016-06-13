@@ -16,11 +16,18 @@ public:
 class fileSource
 {
 protected:
+    std::string rgb_dir;
+    std::string depth_dir;
+    std::string rgb_marker;
+    std::string depth_marker;
+    std::string rgb_extension;
+    std::string depth_extension;
     std::string source_dir;
     float frame_rate;
     float frame_time_interval;
     float current_time;
     unsigned frame_count;
+    unsigned frame_start;
     unsigned frame_end;
 
     camera_intrinsic_parameters camera;
@@ -37,7 +44,18 @@ public:
         current_time = ct;
         frame_time_interval = 1/frame_rate;
         frame_count = 0;
+        frame_start = 0;
         frame_end = 0;
+    }
+
+    float getCurrentTime()
+    {
+        return current_time;
+    }
+
+    unsigned getCurrentFrameIndex()
+    {
+        return (frame_start+frame_count);
     }
 
     void setSourceDir(const char* str)
@@ -69,12 +87,12 @@ public:
         current_time = t;
     }
 
-    void setStartFrameNumber(unsigned n)
+    void setStartIndex(unsigned n)
     {
-        frame_count = n;
+        frame_start = n;
     }
 
-    void setEndFrameNumber(unsigned n)
+    void setEndIndex(unsigned n)
     {
         frame_end = n;
     }

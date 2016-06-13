@@ -10,43 +10,58 @@
 
 
 //------------------------------------------------------------
-void axisAngleToQuaternion(const Eigen::Vector3f &axis,
+template<typename scalarT>
+void axisAngleToQuaternion(const Eigen::Matrix<scalarT,3,1> &axis,
                            float angle,
-                           Eigen::Quaternionf &quaternion);
+                           Eigen::Quaternion<scalarT> &quaternion);
 
 //------------------------------------------------------------
-void quaternionToAxisAngle(const Eigen::Quaternionf &quaternion,
-                           Eigen::Vector3f &axis,
+template<typename scalarT>
+void quaternionToAxisAngle(const Eigen::Quaternion<scalarT> &quaternion,
+                           Eigen::Matrix<scalarT,3,1> &axis,
                            float &angle);
 
 //------------------------------------------------------------
-void axisAngleToRotationMatrix(const Eigen::Vector3f &axis,
+template<typename scalarT>
+void axisAngleToRotationMatrix(const Eigen::Matrix<scalarT,3,1> &axis,
                                float angle,
-                               Eigen::Matrix3f &rotmat);
+                               Eigen::Matrix<scalarT,3,3> &rotmat);
 
 //------------------------------------------------------------
-void rotationMatrixToAxisAngle(const Eigen::Matrix3f &rotmat,
-                               Eigen::Vector3f &axis,
+template<typename scalarT>
+void rotationMatrixToAxisAngle(const Eigen::Matrix<scalarT,3,3> &rotmat,
+                               Eigen::Matrix<scalarT,3,1> &axis,
                                float &angle);
 
 //------------------------------------------------------------
-void rotationMatrixToQuaternion(const Eigen::Matrix3f &rotmat, Eigen::Quaternionf &quaternion);
+template<typename scalarT>
+void rotationMatrixToQuaternion(const Eigen::Matrix<scalarT,3,3> &rotmat,
+                                Eigen::Quaternion<scalarT> &quaternion);
 
 //------------------------------------------------------------
-void quaternionToRotationMatrix(const Eigen::Quaternionf &quaternion, Eigen::Matrix3f &rotmat);
+template<typename scalarT>
+void quaternionToRotationMatrix(const Eigen::Quaternion<scalarT> &quaternion,
+                                Eigen::Matrix<scalarT,3,3> &rotmat);
 
 //------------------------------------------------------------
-void eulerAngleToQuaternion_XYZ(const Eigen::Vector3f &eulerAngles, Eigen::Quaternionf &quaternion);
+template<typename scalarT>
+void eulerAngleToQuaternion_XYZ(const Eigen::Matrix<scalarT,3,1> &eulerAngles,
+                                Eigen::Quaternion<scalarT> &quaternion);
 
 //------------------------------------------------------------
-void quaternionToEulerAngle_XYZ(const Eigen::Quaternionf &quaternion, Eigen::Vector3f &eulerAngles);
+template<typename scalarT>
+void quaternionToEulerAngle_XYZ(const Eigen::Quaternion<scalarT> &quaternion,
+                                Eigen::Matrix<scalarT,3,1> &eulerAngles);
 
 //------------------------------------------------------------
-void rotationMatrixToEulerAngle_XYZ(const Eigen::Matrix3f &rotmat, Eigen::Vector3f &eulerAngles);
+template<typename scalarT>
+void rotationMatrixToEulerAngle_XYZ(const Eigen::Matrix<scalarT, 3, 3> &rotmat,
+                                    Eigen::Matrix<scalarT, 3, 1> &eulerAngles);
 
 //------------------------------------------------------------
-void eulerAnglesToRotationMatrix_XYZ(const Eigen::Vector3f &eulerAngles, Eigen::Matrix3f &rotmat);
-
+template<typename scalarT>
+void eulerAnglesToRotationMatrix_XYZ(const Eigen::Matrix<scalarT,3,1> &eulerAngles,
+                                     Eigen::Matrix<scalarT,3,3> &rotmat);
 
 
 

@@ -44,12 +44,13 @@ inline float getSign(float x)
 
 
 //------------------------------------------------------------
-void axisAngleToQuaternion(const Eigen::Vector3f &axis,
+template<typename scalarT>
+void axisAngleToQuaternion(const Eigen::Matrix<scalarT,3,1> &axis,
                            float angle,
-                           Eigen::Quaternionf &quaternion)
+                           Eigen::Quaternion<scalarT> &quaternion)
 {
-    float c = cosf(angle/2);
-    float s = sinf(angle/2);
+    scalarT c = cos(angle/2);
+    scalarT s = sin(angle/2);
     quaternion.w() = c;
     quaternion.x() = axis(0)*s;
     quaternion.y() = axis(1)*s;
@@ -57,21 +58,22 @@ void axisAngleToQuaternion(const Eigen::Vector3f &axis,
 }
 
 //------------------------------------------------------------
-void quaternionToAxisAngle(const Eigen::Quaternionf &quaternion,
-                           Eigen::Vector3f &axis,
+template<typename scalarT>
+void quaternionToAxisAngle(const Eigen::Quaternion<scalarT> &quaternion,
+                           Eigen::Matrix<scalarT,3,1> &axis,
                            float &angle)
 {
     // assume angle is in [0, pi]
-    float q0 = quaternion.w();
-    float half_angle = 0.0f;
+    scalarT q0 = quaternion.w();
+    scalarT half_angle = 0.0;
 
     if(q0<0)
     {
         // means that angle is beyond [0, pi], >pi
         half_angle = acosf(q0);
-        float s = sinf(half_angle);
+        scalarT s = sin(half_angle);
 
-        angle = half_angle*2.0f-(float)M_PI;
+        angle = half_angle*2.0-M_PI;
         axis(0) = -quaternion.x()/s;
         axis(1) = -quaternion.y()/s;
         axis(2) = -quaternion.z()/s;
@@ -79,7 +81,7 @@ void quaternionToAxisAngle(const Eigen::Quaternionf &quaternion,
     else if(fabs(q0)<FLT_EPSILON)
     {
         // q0 = 0, angle = pi
-        angle = (float)M_PI;
+        angle = M_PI;
         axis(0) = quaternion.x();
         axis(1) = quaternion.y();
         axis(2) = quaternion.z();
@@ -87,8 +89,8 @@ void quaternionToAxisAngle(const Eigen::Quaternionf &quaternion,
     else
     {
         // q0 > 0
-        half_angle = acosf(q0);
-        float s = sinf(half_angle);
+        half_angle = acos(q0);
+        scalarT s = sinf(half_angle);
 
         angle = half_angle*2.0f;
         axis(0) = quaternion.x()/s;
@@ -98,17 +100,18 @@ void quaternionToAxisAngle(const Eigen::Quaternionf &quaternion,
 }
 
 //------------------------------------------------------------
-void axisAngleToRotationMatrix(const Eigen::Vector3f &axis,
+template<typename scalarT>
+void axisAngleToRotationMatrix(const Eigen::Matrix<scalarT,3,1> &axis,
                                float angle,
-                               Eigen::Matrix3f &rotmat)
+                               Eigen::Matrix<scalarT,3,3> &rotmat)
 {
-    float ux = axis(0);
-    float uy = axis(1);
-    float uz = axis(2);
+    scalarT ux = axis(0);
+    scalarT uy = axis(1);
+    scalarT uz = axis(2);
 
     // use c and s to represent cos angle and sin angle
-    float c = cos(angle);
-    float s = sin(angle);
+    scalarT c = cos(angle);
+    scalarT s = sin(angle);
 
     // compute the rotation matrix element
     rotmat(0,0) = ux*ux*(1-c)+c;    rotmat(0,1) = ux*uy*(1-c)-uz*s; rotmat(0,2) = ux*uz*(1-c)+uy*s;
@@ -117,40 +120,41 @@ void axisAngleToRotationMatrix(const Eigen::Vector3f &axis,
 }
 
 //------------------------------------------------------------
-void rotationMatrixToAxisAngle(const Eigen::Matrix3f &rotmat,
-                               Eigen::Vector3f &axis,
+template<typename scalarT>
+void rotationMatrixToAxisAngle(const Eigen::Matrix<scalarT,3,3> &rotmat,
+                               Eigen::Matrix<scalarT,3,1> &axis,
                                float &angle)
 {
     // compute the matrix trace to get rotation angle.
     // here rotation angle is in the interval [0, pi],
     // so attention should paid to the rotation angle value outside this
     // interval.
-    float trace = rotmat(0,0)+rotmat(1,1)+rotmat(2,2);
-    float cos_theta = 0.5f*(trace-1);
-    if(fabs(cos_theta+1)<2*FLT_EPSILON)
-        angle = (float)M_PI;
+    scalarT trace = rotmat(0,0)+rotmat(1,1)+rotmat(2,2);
+    scalarT cos_theta = 0.5f*(trace-1);
+    if(fabs((double)cos_theta+1)<2*DBL_EPSILON)
+        angle = M_PI;
     else
         angle = acos(cos_theta);
 
     // compute [R-I], to get the eigen vector corresponding to the eigen velue 1
-    Eigen::Matrix3f rot_i = rotmat - Eigen::Matrix3f::Identity();
+    Eigen::Matrix<scalarT,3,3> rot_i = rotmat - Eigen::Matrix<scalarT,3,3>::Identity();
     // do svd, the ideal eigen vector is the right eigen vector corresponding to
     // the smallest singular value 0
-    Eigen::JacobiSVD<Eigen::Matrix3f> svd(rot_i, Eigen::ComputeFullV);
-    Eigen::Vector3f rot_axis = svd.matrixV().col(2);
+    Eigen::JacobiSVD<Eigen::Matrix<scalarT,3,3> > svd(rot_i, Eigen::ComputeFullV);
+    Eigen::Matrix<scalarT,3,1> rot_axis = svd.matrixV().col(2);
 
     // to handle the direction of the rotation axis. because the calculated
     // angle is always within [0, pi], for other true angle value, the axis
     // direction should flipped so that the [angle] can be fit to [0, pi].
-    float ux = fabs(rot_axis(0));
-    float uy = fabs(rot_axis(1));
-    float uz = fabs(rot_axis(2));
+    scalarT ux = fabs(rot_axis(0));
+    scalarT uy = fabs(rot_axis(1));
+    scalarT uz = fabs(rot_axis(2));
 
     // [sin angle] is always >= 0, so the sign of uz_sin is up to uz, so is the
     // uy_sin anf ux_sin.
-    float uz_sin = rotmat(1,0)-rotmat(0,1);
-    float uy_sin = rotmat(0,2)-rotmat(2,0);
-    float ux_sin = rotmat(2,1)-rotmat(1,2);
+    scalarT uz_sin = rotmat(1,0)-rotmat(0,1);
+    scalarT uy_sin = rotmat(0,2)-rotmat(2,0);
+    scalarT ux_sin = rotmat(2,1)-rotmat(1,2);
 
     axis(0) = ux*getSign(ux_sin);
     axis(1) = uy*getSign(uy_sin);
@@ -158,23 +162,25 @@ void rotationMatrixToAxisAngle(const Eigen::Matrix3f &rotmat,
 }
 
 //------------------------------------------------------------
-void rotationMatrixToQuaternion(const Eigen::Matrix3f &rotmat, Eigen::Quaternionf &quaternion)
+template<typename scalarT>
+void rotationMatrixToQuaternion(const Eigen::Matrix<scalarT,3,3> &rotmat,
+                                Eigen::Quaternion<scalarT> &quaternion)
 {
-    float trace_r = rotmat(0,0)+rotmat(1,1)+rotmat(2,2);
-    float q0 = sqrtf(trace_r+1)/2.0f;
+    scalarT trace_r = rotmat(0,0)+rotmat(1,1)+rotmat(2,2);
+    scalarT q0 = sqrt(trace_r+1)/2.0;
 
     // if q0 == 0, use the angle axis decomposition
     // else use equation
-    if(fabs(q0)<FLT_EPSILON)
+    if(fabs((double)q0)<DBL_EPSILON)
     {
         // first to calsulate the rotation axis and rotation angle
-        Eigen::Vector3f axis(0.0f, 0.0f, 0.0f);
-        float angle = 0.0f;
-        rotationMatrixToAxisAngle(rotmat, axis, angle);
+        Eigen::Matrix<scalarT,3,1> axis(0.0, 0.0, 0.0);
+        scalarT angle = 0.0;
+        rotationMatrixToAxisAngle<scalarT>(rotmat, axis, angle);
 
         // then construct the quaternion with the axis and angle
-        float c = cos(angle/2);
-        float s = sin(angle/2);
+        scalarT c = cos(angle/2);
+        scalarT s = sin(angle/2);
         quaternion.w() = c;
         quaternion.x() = axis(0)*s;
         quaternion.y() = axis(1)*s;
@@ -190,25 +196,29 @@ void rotationMatrixToQuaternion(const Eigen::Matrix3f &rotmat, Eigen::Quaternion
 }
 
 //------------------------------------------------------------
-void quaternionToRotationMatrix(const Eigen::Quaternionf &quaternion, Eigen::Matrix3f &rotmat)
+template<typename scalarT>
+void quaternionToRotationMatrix(const Eigen::Quaternion<scalarT> &quaternion,
+                                Eigen::Matrix<scalarT,3,3> &rotmat)
 {
     rotmat = quaternion.matrix();
 }
 
 //------------------------------------------------------------
-void eulerAngleToQuaternion_XYZ(const Eigen::Vector3f &eulerAngles, Eigen::Quaternionf &quaternion)
+template<typename scalarT>
+void eulerAngleToQuaternion_XYZ(const Eigen::Matrix<scalarT,3,1> &eulerAngles,
+                                Eigen::Quaternion<scalarT> &quaternion)
 {
     // euler angle
-    float phi = eulerAngles(2); // z axis
-    float theta = eulerAngles(1); // y axis
-    float psi = eulerAngles(0); // x axis
+    scalarT phi = eulerAngles(2); // z axis
+    scalarT theta = eulerAngles(1); // y axis
+    scalarT psi = eulerAngles(0); // x axis
 
-    float c_psi_h = cosf(psi/2.0f);
-    float s_psi_h = sinf(psi/2.0f);
-    float c_theta_h = cosf(theta/2.0f);
-    float s_theta_h = sinf(theta/2.0f);
-    float c_phi_h = cosf(phi/2.0f);
-    float s_phi_h = sinf(phi/2.0f);
+    scalarT c_psi_h = cos(psi/2.0);
+    scalarT s_psi_h = sin(psi/2.0);
+    scalarT c_theta_h = cos(theta/2.0);
+    scalarT s_theta_h = sin(theta/2.0);
+    scalarT c_phi_h = cos(phi/2.0);
+    scalarT s_phi_h = sin(phi/2.0);
 
     quaternion.w() = c_psi_h*c_theta_h*c_phi_h + s_psi_h*s_theta_h*s_phi_h;
     quaternion.x() = s_psi_h*c_theta_h*c_phi_h - c_psi_h*s_theta_h*s_phi_h;
@@ -217,31 +227,33 @@ void eulerAngleToQuaternion_XYZ(const Eigen::Vector3f &eulerAngles, Eigen::Quate
 }
 
 //------------------------------------------------------------
-void quaternionToEulerAngle_XYZ(const Eigen::Quaternionf &quaternion, Eigen::Vector3f &eulerAngles)
+template<typename scalarT>
+void quaternionToEulerAngle_XYZ(const Eigen::Quaternion<scalarT> &quaternion,
+                                Eigen::Matrix<scalarT,3,1> &eulerAngles)
 {
-    float q0 = quaternion.w();
-    float q1 = quaternion.x();
-    float q2 = quaternion.y();
-    float q3 = quaternion.z();
-    float theta = asinf(2.0f*(q0*q2-q3*q1));
-    float phi = 0.0f;
-    float psi = 0.0f;
-    if(fabs(theta-(float)M_PI/2.0f)<FLT_EPSILON)
+    scalarT q0 = quaternion.w();
+    scalarT q1 = quaternion.x();
+    scalarT q2 = quaternion.y();
+    scalarT q3 = quaternion.z();
+    scalarT theta = asin(2.0*(q0*q2-q3*q1));
+    scalarT phi = 0.0;
+    scalarT psi = 0.0;
+    if(fabs((double)theta-M_PI/2.0f)<DBL_EPSILON)
     {
         // theta = pi/2
-        phi = 0.0f;
-        psi = phi - 2.0f*atan2f(q1, q0);
+        phi = 0.0;
+        psi = phi - 2.0*atan2(q1, q0);
     }
-    else if(fabs(theta+(float)M_PI/2.0f)<FLT_EPSILON)
+    else if(fabs((double)theta+M_PI/2.0f)<DBL_EPSILON)
     {
         // theta = -pi/2
-        phi = 0.0f;
-        psi = -phi + 2.0f*atan2f(q1, q0);
+        phi = 0.0;
+        psi = -phi + 2.0*atan2(q1, q0);
     }
     else
     {
-        phi = atan2f(2*(q0*q1+q2*q3), 1-2*(q1*q1+q2*q2));
-        psi = atan2f(2*(q0*q3+q1*q2), 1-2*(q2*q2+q3*q3));
+        phi = atan2(2*(q0*q1+q2*q3), 1-2*(q1*q1+q2*q2));
+        psi = atan2(2*(q0*q3+q1*q2), 1-2*(q2*q2+q3*q3));
     }
 
     eulerAngles(0) = psi; // x axis
@@ -250,32 +262,34 @@ void quaternionToEulerAngle_XYZ(const Eigen::Quaternionf &quaternion, Eigen::Vec
 }
 
 //------------------------------------------------------------
-void rotationMatrixToEulerAngle_XYZ(const Eigen::Matrix3f &rotmat, Eigen::Vector3f &eulerAngles)
+template<typename scalarT>
+void rotationMatrixToEulerAngle_XYZ(const Eigen::Matrix<scalarT, 3, 3> &rotmat,
+                                    Eigen::Matrix<scalarT, 3, 1> &eulerAngles)
 {
-    float r11 = rotmat(0,0); float r12 = rotmat(0,1); float r13 = rotmat(0,2);
-    float r21 = rotmat(1,0); float r22 = rotmat(1,1); float r23 = rotmat(1,2);
-    float r31 = rotmat(2,0); float r32 = rotmat(2,1); float r33 = rotmat(2,2);
+    scalarT r11 = rotmat(0,0); scalarT r12 = rotmat(0,1); scalarT r13 = rotmat(0,2);
+    scalarT r21 = rotmat(1,0); scalarT r22 = rotmat(1,1); scalarT r23 = rotmat(1,2);
+    scalarT r31 = rotmat(2,0); scalarT r32 = rotmat(2,1); scalarT r33 = rotmat(2,2);
 
-    float psi, theta, phi;
-    if(fabs(r31+1)<FLT_EPSILON)
+    scalarT psi, theta, phi;
+    if(fabs((double)r31+1)<DBL_EPSILON)
     {
         // theta = pi/2
-        theta = (float)M_PI/2.0f;
-        phi = 0.0f;
-        psi = phi + atan2f(r12, r13);
+        theta = M_PI/2.0;
+        phi = 0.0;
+        psi = phi + atan2(r12, r13);
     }
-    else if(fabs(r31-1)<FLT_EPSILON)
+    else if(fabs((double)r31-1)<DBL_EPSILON)
     {
         // theta = -pi/2
-        theta = (float)-M_PI/2.0f;
-        phi = 0.0f;
-        psi = phi + atan2f(-r12, -r13);
+        theta = -M_PI/2.0;
+        phi = 0.0;
+        psi = phi + atan2(-r12, -r13);
     }
     else
     {
-        theta = -asinf(r31);
-        psi = atan2f(r32/cosf(theta), r33/cosf(theta));
-        phi = atan2f(r21/cosf(theta), r11/cosf(theta));
+        theta = -asin(r31);
+        psi = atan2(r32/cos(theta), r33/cos(theta));
+        phi = atan2(r21/cos(theta), r11/cos(theta));
     }
 
     eulerAngles(0) = psi; // x axis
@@ -284,19 +298,21 @@ void rotationMatrixToEulerAngle_XYZ(const Eigen::Matrix3f &rotmat, Eigen::Vector
 }
 
 //------------------------------------------------------------
-void eulerAnglesToRotationMatrix_XYZ(const Eigen::Vector3f &eulerAngles, Eigen::Matrix3f &rotmat)
+template<typename scalarT>
+void eulerAnglesToRotationMatrix_XYZ(const Eigen::Matrix<scalarT,3,1> &eulerAngles,
+                                     Eigen::Matrix<scalarT,3,3> &rotmat)
 {
     // euler angle
-    float phi = eulerAngles(2); // z axis
-    float theta = eulerAngles(1); // y axis
-    float psi = eulerAngles(0); // x axis
+    scalarT phi = eulerAngles(2); // z axis
+    scalarT theta = eulerAngles(1); // y axis
+    scalarT psi = eulerAngles(0); // x axis
 
-    float c_psi = cosf(psi);
-    float s_psi = sinf(psi);
-    float c_theta = cosf(theta);
-    float s_theta = sinf(theta);
-    float c_phi = cosf(phi);
-    float s_phi = sinf(phi);
+    scalarT c_psi = cos(psi);
+    scalarT s_psi = sin(psi);
+    scalarT c_theta = cos(theta);
+    scalarT s_theta = sin(theta);
+    scalarT c_phi = cos(phi);
+    scalarT s_phi = sin(phi);
 
     rotmat(0,0) = c_theta*c_phi; rotmat(0,1) = s_psi*s_theta*c_phi-c_psi*s_phi; rotmat(0,2) = c_psi*s_theta*c_phi+s_psi*s_phi;
     rotmat(1,0) = c_theta*s_phi; rotmat(1,1) = s_psi*s_theta*s_phi+c_psi*c_phi; rotmat(2,1) = c_psi*s_theta*s_phi-s_psi*c_phi;

@@ -4,6 +4,15 @@ project(slam_base)
 set(CMAKE_BUILD_TYPE Release)
 
 set(CMAKE_CXX_COMPILER "g++")
+
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+if(COMPILER_SUPPORTS_CXX11)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+else()
+    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+endif()
+
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
@@ -12,6 +21,13 @@ set(OpenCV_DIR /home/jyi/Devel/OpenCV/2412/share/OpenCV)
 
 find_package(PCL REQUIRED)
 find_package(OpenCV REQUIRED)
+
+SET(G2O_ROOT /home/jyi/Devel/g2o)
+LIST( APPEND CMAKE_MODULE_PATH ${G2O_ROOT}/cmake_modules )
+FIND_PACKAGE(G2O)
+# CSparse
+FIND_PACKAGE(CSparse)
+INCLUDE_DIRECTORIES( ${G2O_INCLUDE_DIR} ${CSPARSE_INCLUDE_DIR} )
 
 set(Libconfig_INCLUDE_DIRS /home/jyi/Devel/0000Small/libconfig/include)
 set(Libconfig_LIB_DIR /home/jyi/Devel/0000Small/libconfig/lib)
