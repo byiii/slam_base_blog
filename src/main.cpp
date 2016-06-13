@@ -15,6 +15,49 @@
 
 int main(int argc, char** argv)
 {
+
+    // initialize
+    using std::cout;
+    using std::endl;
+    cout<<"Initializing ..."<<endl;
+
+    //本节要拼合data中的两对图像
+    slamParameters param;
+    param.configure("../config/parameters.cfg");
+
+    // camera model
+    camera_intrinsic_parameters camera;
+    camera.cx = param.camera_cx;
+    camera.cy = param.camera_cy;
+    camera.fx = param.camera_fx;
+    camera.fy = param.camera_fy;
+    camera.scale = param.camera_factor;
+
+    frame::parameters frame_param;
+    frame_param.descriptor_type = "SIFT";
+    frame_param.detector_type = "SIFT";
+
+    fileSource source("../data");
+    source.depth_dir = "/home/jyi/Data/rgbd_slam/depth_png";
+    source.depth_marker = "";
+    source.depth_extension = ".png";
+    source.rgb_dir = "/home/jyi/Data/rgbd_slam/rgb_png";
+    source.rgb_marker = "";
+    source.rgb_extension = ".png";
+    source.setCamera(camera);
+    source.setStartIndex(100);
+    source.setEndIndex(300);
+
+    visualOdometry vo;
+    vo.setImageSource(&source);
+    vo.setCamera(camera);
+
+    vo.run();
+}
+
+//int main(int argc, char** argv)
+int main_testSource(int argc, char** argv)
+{
     using std::cout;
     using std::endl;
 
@@ -35,6 +78,12 @@ int main(int argc, char** argv)
     frame_param.detector_type = "SIFT";
 
     fileSource source("../data");
+    source.depth_dir = "../data/depth_png";
+    source.depth_marker = "";
+    source.depth_extension = ".png";
+    source.rgb_dir = "../data/rgb_png";
+    source.rgb_marker = "";
+    source.rgb_extension = ".png";
     source.setCamera(camera);
     source.setStartIndex(1);
     source.setEndIndex(2);
@@ -171,7 +220,7 @@ int main_tutorial4_a( int argc, char** argv )
     // 处理result
     // 将旋转向量转化为旋转矩阵
     Eigen::Matrix3f r;
-    eulerAnglesToRotationMatrix_XYZ<float>(result.transformation.rotat_vec, r);
+    //eulerAnglesToRotationMatrix_XYZ_Eigen<float>(result.transformation.rotat_vec, r);
 
     // 将平移向量和旋转矩阵转换成变换矩阵
     Eigen::Isometry3f T = Eigen::Isometry3f::Identity();

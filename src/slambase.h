@@ -17,6 +17,8 @@
 #include "visualizer.h"
 #include "axis_angle.h"
 
+#include "visualOdometry.h"
+
 class slamBase
 {
 public:

@@ -13,7 +13,7 @@ rgbdSource::rgbdSource()
 //------------------------------------------------------------
 int fileSource::generateNewFrame(frame &aframe)
 {
-    if(frame_count > frame_end)
+    if(frame_start+frame_count > frame_end)
     {
         std::cout << "\n----------------------------------------\n"
                      "last frame reached."
@@ -21,18 +21,20 @@ int fileSource::generateNewFrame(frame &aframe)
         return EXIT_FAILURE;
     }
 
-    char colorFile[30] = {0};
-    char depthFile[30] = {0};
-    sprintf(colorFile, "%s/rgb%d.png", source_dir.c_str(), frame_start+frame_count);
-    sprintf(depthFile, "%s/depth%d.png", source_dir.c_str(), frame_count);
+    char colorFile[100] = {0};
+    char depthFile[100] = {0};
+    sprintf(colorFile, "%s/%d%s",
+            rgb_dir.c_str(), frame_start+frame_count, rgb_extension.c_str());
+    sprintf(depthFile, "%s/%d%s",
+            depth_dir.c_str(), frame_start+frame_count, depth_extension.c_str());
 
     current_time += frame_time_interval;
     frame_count += 1;
     std::cout << "current time: " << current_time << "s" << std::endl
               << "reading files: " << colorFile << ", " << depthFile
-              << "\nframe number #" << frame_count-1 << std::endl;
+              << "\nframe number #" << frame_count << std::endl;
 
-    cv::Mat rgb = cv::imread( colorFile);
+    cv::Mat rgb = cv::imread(colorFile);
     cv::Mat depth = cv::imread(depthFile, -1);
     if(!rgb.data || !depth.data)
     {
@@ -49,3 +51,4 @@ int fileSource::generateNewFrame(frame &aframe)
 
     return EXIT_SUCCESS;
 }
+

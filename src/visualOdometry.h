@@ -29,10 +29,10 @@ public:
             start_index = 1;
             end_index = 1;
             source_dir = "../data";
-            rgb_dir = source_dir;
-            depth_dir = source_dir;
-            rgb_marker = "rgb";
-            depth_marker = "depth";
+            rgb_dir = "../data/rgb_png";
+            depth_dir = "../data/depth_png";
+            rgb_marker = "";
+            depth_marker = "";
             rgb_extension = ".png";
             depth_extension = ".png";
 
@@ -54,6 +54,11 @@ public:
 
     void run();
     void run_with_g2o();
+    void setImageSource(fileSource *f)
+    {
+        file_source = f;
+    }
+
     void setCamera(const camera_intrinsic_parameters &c)
     {
         camera = c;

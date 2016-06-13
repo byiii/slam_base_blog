@@ -4,7 +4,10 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cstdlib>
+#include <unistd.h>
 
+#include <pcl/io/pcd_io.h>
 #include <pcl/visualization/cloud_viewer.h>
 #include "slambase.h"
 
@@ -38,39 +41,17 @@ float visualOdometry::normofTransform(SixDegreeTransformation &transform)
 
 void visualOdometry::run_with_g2o()
 {
-
-    // initialize
-    cout<<"Initializing ..."<<endl;
-    using std::cout;
-    using std::endl;
-
-    //本节要拼合data中的两对图像
-    slamParameters param;
-    param.configure("../config/parameters.cfg");
-
-    // camera model
-    camera_intrinsic_parameters camera;
-    camera.cx = param.camera_cx;
-    camera.cy = param.camera_cy;
-    camera.fx = param.camera_fx;
-    camera.fy = param.camera_fy;
-    camera.scale = param.camera_factor;
-
     frame::parameters frame_param;
     frame_param.descriptor_type = "SIFT";
     frame_param.detector_type = "SIFT";
 
-    fileSource source("../data");
-    source.setCamera(camera);
-    source.setStartIndex(1);
-
     frame lastFrame;
-    if(!source.generateNewFrame(lastFrame))
+    if(!file_source->generateNewFrame(lastFrame))
     {
         cout << "failed to read image, exit." << endl;
         return;
     }
-    unsigned current_index = source.getCurrentFrameIndex();
+    unsigned current_index = file_source->getCurrentFrameIndex();
 
     lastFrame.setParameters(frame_param);
     lastFrame.computePointCloud();
@@ -110,9 +91,10 @@ void visualOdometry::run_with_g2o()
 
     frame currFrame;
     unsigned last_index = current_index;
-    while (source.generateNewFrame(currFrame))
+    while (file_source->generateNewFrame(currFrame))
     {
         currFrame.setParameters(frame_param);
+        currFrame.computePointCloud();
         currFrame.computeKeypointsAndDescriptors();
 
         // 求解pnp
@@ -181,34 +163,12 @@ void visualOdometry::run_with_g2o()
 
 void visualOdometry::run()
 {
-
-    // initialize
-    cout<<"Initializing ..."<<endl;
-    using std::cout;
-    using std::endl;
-
-    //本节要拼合data中的两对图像
-    slamParameters param;
-    param.configure("../config/parameters.cfg");
-
-    // camera model
-    camera_intrinsic_parameters camera;
-    camera.cx = param.camera_cx;
-    camera.cy = param.camera_cy;
-    camera.fx = param.camera_fx;
-    camera.fy = param.camera_fy;
-    camera.scale = param.camera_factor;
-
     frame::parameters frame_param;
     frame_param.descriptor_type = "SIFT";
     frame_param.detector_type = "SIFT";
 
-    fileSource source("../data");
-    source.setCamera(camera);
-    source.setStartIndex(1);
-
     frame lastFrame;
-    if(!source.generateNewFrame(lastFrame))
+    if(file_source->generateNewFrame(lastFrame)==1)
     {
         cout << "failed to read image, exit." << endl;
         return;
@@ -218,18 +178,18 @@ void visualOdometry::run()
     lastFrame.computeKeypointsAndDescriptors();
     PointCloudT_Ptr cloud = lastFrame.getPointCloudCopy();
 
-    pcl::visualization::CloudViewer viewer("viewer");
-
     // 是否显示点云
+    pcl::visualization::CloudViewer viewer("viewer");
     bool visualize = this->param.visualize_pointCloud;
 
     int min_inliers = this->param.min_inliers;
     float max_norm = this->param.max_norm;
 
     frame currFrame;
-    while (source.generateNewFrame(currFrame))
+    while (file_source->generateNewFrame(currFrame)==0)
     {
         currFrame.setParameters(frame_param);
+        currFrame.computePointCloud();
         currFrame.computeKeypointsAndDescriptors();
 
         // 求解pnp
@@ -254,15 +214,14 @@ void visualOdometry::run()
 
         // 合并点云
         cout<<"combining clouds"<<endl;
-        fusingPointCloud(*cloud, *current_cloud, *cloud, affine);
-
+        fusingPointCloud(*cloud, *current_cloud, affine);
 
         if ( visualize == true )
-            viewer.showCloud( cloud );
+            viewer.showCloud(cloud);
 
         lastFrame = currFrame;
     }
 
-    //pcl::io::savePCDFile( "data/result.pcd", *cloud );
+    pcl::io::savePCDFile( "../data/result.pcd", *cloud );
     return;
 }

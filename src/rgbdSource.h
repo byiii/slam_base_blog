@@ -15,7 +15,7 @@ public:
 
 class fileSource
 {
-protected:
+public:
     std::string rgb_dir;
     std::string depth_dir;
     std::string rgb_marker;
@@ -23,6 +23,7 @@ protected:
     std::string rgb_extension;
     std::string depth_extension;
     std::string source_dir;
+protected:
     float frame_rate;
     float frame_time_interval;
     float current_time;

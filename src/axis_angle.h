@@ -1,6 +1,8 @@
 #ifndef AXIS_ANGLE_H_
 #define AXIS_ANGLE_H_
 
+#pragma once
+
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 
@@ -12,58 +14,56 @@
 //------------------------------------------------------------
 template<typename scalarT>
 void axisAngleToQuaternion(const Eigen::Matrix<scalarT,3,1> &axis,
-                           float angle,
-                           Eigen::Quaternion<scalarT> &quaternion);
+                                 scalarT angle,
+                                 Eigen::Quaternion<scalarT> &quaternion);
 
 //------------------------------------------------------------
 template<typename scalarT>
 void quaternionToAxisAngle(const Eigen::Quaternion<scalarT> &quaternion,
-                           Eigen::Matrix<scalarT,3,1> &axis,
-                           float &angle);
+                                 Eigen::Matrix<scalarT,3,1> &axis,
+                                 scalarT &angle);
 
 //------------------------------------------------------------
 template<typename scalarT>
 void axisAngleToRotationMatrix(const Eigen::Matrix<scalarT,3,1> &axis,
-                               float angle,
-                               Eigen::Matrix<scalarT,3,3> &rotmat);
+                                     scalarT angle,
+                                     Eigen::Matrix<scalarT,3,3> &rotmat);
 
 //------------------------------------------------------------
 template<typename scalarT>
 void rotationMatrixToAxisAngle(const Eigen::Matrix<scalarT,3,3> &rotmat,
-                               Eigen::Matrix<scalarT,3,1> &axis,
-                               float &angle);
+                                     Eigen::Matrix<scalarT,3,1> &axis,
+                                     scalarT &angle);
 
 //------------------------------------------------------------
 template<typename scalarT>
 void rotationMatrixToQuaternion(const Eigen::Matrix<scalarT,3,3> &rotmat,
-                                Eigen::Quaternion<scalarT> &quaternion);
+                                      Eigen::Quaternion<scalarT> &quaternion);
 
 //------------------------------------------------------------
 template<typename scalarT>
 void quaternionToRotationMatrix(const Eigen::Quaternion<scalarT> &quaternion,
-                                Eigen::Matrix<scalarT,3,3> &rotmat);
+                                      Eigen::Matrix<scalarT,3,3> &rotmat);
 
 //------------------------------------------------------------
 template<typename scalarT>
 void eulerAngleToQuaternion_XYZ(const Eigen::Matrix<scalarT,3,1> &eulerAngles,
-                                Eigen::Quaternion<scalarT> &quaternion);
+                                      Eigen::Quaternion<scalarT> &quaternion);
 
 //------------------------------------------------------------
 template<typename scalarT>
 void quaternionToEulerAngle_XYZ(const Eigen::Quaternion<scalarT> &quaternion,
-                                Eigen::Matrix<scalarT,3,1> &eulerAngles);
+                                      Eigen::Matrix<scalarT,3,1> &eulerAngles);
 
 //------------------------------------------------------------
 template<typename scalarT>
-void rotationMatrixToEulerAngle_XYZ(const Eigen::Matrix<scalarT, 3, 3> &rotmat,
-                                    Eigen::Matrix<scalarT, 3, 1> &eulerAngles);
+void rotationMatrixToEulerAngle_XYZ(const Eigen::Matrix<scalarT,3,3> &rotmat,
+                                          Eigen::Matrix<scalarT,3,1> &eulerAngles);
 
 //------------------------------------------------------------
 template<typename scalarT>
 void eulerAnglesToRotationMatrix_XYZ(const Eigen::Matrix<scalarT,3,1> &eulerAngles,
-                                     Eigen::Matrix<scalarT,3,3> &rotmat);
-
-
+                                           Eigen::Matrix<scalarT,3,3> &rotmat);
 
 //------------------------------------------------------------
 // double array representation
