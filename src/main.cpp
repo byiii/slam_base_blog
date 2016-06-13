@@ -52,7 +52,7 @@ int main(int argc, char** argv)
     return 0;
 }
 
-int main_tutorial4_( int argc, char** argv )
+int main_tutorial4_b( int argc, char** argv )
 //int main()
 {
     using std::cout;
@@ -169,23 +169,16 @@ int main_tutorial4_a( int argc, char** argv )
 
     // 处理result
     // 将旋转向量转化为旋转矩阵
-    cv::Mat R;
-    cv::Rodrigues(result.transformation.rotation_vector, R);
-    Eigen::Matrix3d r;
-    cv::cv2eigen(R, r);
+    Eigen::Matrix3f r;
+    eulerAnglesToRotationMatrix_XYZ(result.transformation.rotat_vec, r);
 
     // 将平移向量和旋转矩阵转换成变换矩阵
-    Eigen::Isometry3d T = Eigen::Isometry3d::Identity();
-
-    Eigen::AngleAxisd angle(r);
-    cout<<"translation"<<endl;
-    Eigen::Translation<double,3> trans(result.transformation.translate_vector.at<double>(0,0),
-                                       result.transformation.translate_vector.at<double>(0,1),
-                                       result.transformation.translate_vector.at<double>(0,2));
+    Eigen::Isometry3f T = Eigen::Isometry3f::Identity();
+    Eigen::AngleAxisf angle(r);
     T = angle;
-    T(0,3) = result.transformation.translate_vector.at<double>(0,0);
-    T(1,3) = result.transformation.translate_vector.at<double>(0,1);
-    T(2,3) = result.transformation.translate_vector.at<double>(0,2);
+    T(0,3) = result.transformation.trans_vec(0);
+    T(1,3) = result.transformation.trans_vec(1);
+    T(2,3) = result.transformation.trans_vec(2);
 
     // 转换点云
     cout<< "converting image to clouds" << endl;

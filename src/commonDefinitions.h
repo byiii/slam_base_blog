@@ -4,8 +4,13 @@
 #include <opencv2/core.hpp>
 #include <opencv2/features2d/features2d.hpp>
 
+#include <Eigen/Geometry>
+
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
+
+#include <cfloat>
+#include <cmath>
 
 typedef pcl::PointXYZRGBA PointT;
 typedef pcl::PointCloud<PointT> PointCloudT;
@@ -47,23 +52,22 @@ public:
 
 struct SixDegreeTransformation
 {
-    cv::Mat rotation_vector;
-    cv::Mat translate_vector;
+    Eigen::Vector3f rotat_vec;
+    Eigen::Vector3f trans_vec;
 
     SixDegreeTransformation()
     {
-
-    }
-    ~SixDegreeTransformation()
-    {
-        this->release();
+        rotat_vec = Eigen::Vector3f(.0f, .0f, .0f);
+        trans_vec = Eigen::Vector3f(.0f, .0f, .0f);
     }
 
-    void release()
+    SixDegreeTransformation(Eigen::Matrix4f &mat)
     {
-        rotation_vector.release();
-        translate_vector.release();
+        fromMatrix4f(mat);
     }
+
+    void fromMatrix4f(Eigen::Matrix4f &mat);
+    void toMatrix4f(Eigen::Matrix4f &mat);
 };
 
 
@@ -72,54 +76,5 @@ struct ResultOfPNP
     SixDegreeTransformation transformation;
     int number_of_inliers;
 };
-
-class transformation
-{
-protected:
-    SixDegreeTransformation vector_form;
-    Eigen::Affine3f matrix_form;
-public:
-    transformation(const Eigen::Affine3f &affine)
-    {
-        matrix_form = affine;
-    }
-    transformation(const SixDegreeTransformation &s)
-    {
-        vector_form = s;
-    }
-
-    void getMatrix(Eigen::Affine3f &affine)
-    {
-        affine = matrix_form;
-    }
-
-    void getVectors(SixDegreeTransformation& s)
-    {
-        s = vector_form;
-    }
-protected:
-    void matrix_to_vector();
-    void vector_to_matrix();
-};
-
-
-#include <cfloat>
-#include <cmath>
-
-
-
-/// get the sign of a double
-inline double getSign(double x)
-{
-    if(fabs(x)>DBL_EPSILON)
-    {
-        if(x>0.0)
-            return 1.0;
-        else
-            return -1.0;
-    }
-    else
-        return 1.0;
-}
 
 #endif // COMMON_DEFINITIONS_H

@@ -21,6 +21,7 @@ protected:
     float frame_time_interval;
     float current_time;
     unsigned frame_count;
+    unsigned frame_end;
 
     camera_intrinsic_parameters camera;
 public:
@@ -36,6 +37,7 @@ public:
         current_time = ct;
         frame_time_interval = 1/frame_rate;
         frame_count = 0;
+        frame_end = 0;
     }
 
     void setSourceDir(const char* str)
@@ -72,7 +74,11 @@ public:
         frame_count = n;
     }
 
-    ////////////////////////////////////////////////////////////
+    void setEndFrameNumber(unsigned n)
+    {
+        frame_end = n;
+    }
+
     int generateNewFrame(frame &aframe);
 };
 

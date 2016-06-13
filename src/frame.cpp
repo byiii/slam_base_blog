@@ -9,6 +9,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
+#include <opencv2/core/eigen.hpp>
 
 #include "generatePointCloud.h"
 
@@ -21,8 +22,6 @@ void frame::release()
 
     pointCloud->points.clear();
     pointCloud->clear();
-
-    poseInVectors.release();
 }
 
 
@@ -96,12 +95,12 @@ void estimateMotion_3dTo2d(frame& frame1,
                                     translationVec,
                                     inliers);
 
-    rotationVec.copyTo(result.transformation.rotation_vector);
-    translationVec.copyTo(result.transformation.translate_vector);
+    cv::cv2eigen(rotationVec, result.transformation.rotat_vec);
+    cv::cv2eigen(translationVec, result.transformation.trans_vec);
     result.number_of_inliers = inliers.rows;
 
-    cout << "rotation: " << result.transformation.rotation_vector << endl
-         << "translation: " << result.transformation.translate_vector << endl;
+    cout << "rotation: " << result.transformation.rotat_vec << endl
+         << "translation: " << result.transformation.trans_vec << endl;
 }
 
 

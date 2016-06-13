@@ -10,9 +10,17 @@ rgbdSource::rgbdSource()
 {
 }
 
-////////////////////////////////////////////////////////////
+//------------------------------------------------------------
 int fileSource::generateNewFrame(frame &aframe)
 {
+    if(frame_count >= frame_end)
+    {
+        std::cout << "\n----------------------------------------\n"
+                     "last frame reached."
+                  << std::endl;
+        return EXIT_FAILURE;
+    }
+
     char colorFile[30] = {0};
     char depthFile[30] = {0};
     sprintf(colorFile, "%s/rgb%d.png", source_dir.c_str(), frame_count);

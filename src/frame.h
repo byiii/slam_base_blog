@@ -28,8 +28,8 @@ protected:
     cv::Mat depth;
     cv::Mat descriptors;
     std::vector<cv::KeyPoint> keypoints;
-    SixDegreeTransformation poseInVectors;
-    Eigen::Affine3f pose;
+
+    Eigen::Isometry3f pose;
 
     PointCloudT_Ptr pointCloud;
 
@@ -60,7 +60,9 @@ public:
         another_frame.depth.copyTo(this->depth);
         this->camera = another_frame.camera;
         this->generateTime = another_frame.generateTime;
-        pointCloud = another_frame.pointCloud->makeShared();
+        this->pointCloud = another_frame.pointCloud->makeShared();
+        another_frame.descriptors.copyTo(this->descriptors);
+        this->keypoints = another_frame.keypoints;
 
         return *this;
     }
