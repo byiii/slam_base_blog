@@ -11,13 +11,6 @@ public:
     {
         unsigned start_index;
         unsigned end_index;
-        char *rgb_dir;
-        char *depth_dir;
-        char *rgb_marker;
-        char *depth_marker;
-        char *rgb_extension;
-        char *depth_extension;
-        char *source_dir;
         float voxel_grid;
         bool visualize_pointCloud;
         unsigned min_good_match;
@@ -28,14 +21,6 @@ public:
         {
             start_index = 1;
             end_index = 1;
-            source_dir = "../data";
-            rgb_dir = "../data/rgb_png";
-            depth_dir = "../data/depth_png";
-            rgb_marker = "";
-            depth_marker = "";
-            rgb_extension = ".png";
-            depth_extension = ".png";
-
             voxel_grid = 0.003;
             visualize_pointCloud = true;
             min_good_match = 10;

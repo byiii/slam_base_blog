@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 project(slam_base)
 
 set(CMAKE_BUILD_TYPE Release)
-
+set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_COMPILER "g++")
 
 include(CheckCXXCompilerFlag)
@@ -16,7 +16,7 @@ endif()
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
-#set(PCL_DIR /home/jyi/Devel/pcl/180/share/pcl-1.8)
+set(PCL_DIR /home/jyi/Devel/pcl/180/share/pcl-1.8)
 set(OpenCV_DIR /home/jyi/Devel/OpenCV/2412/share/OpenCV)
 
 find_package(PCL REQUIRED)

@@ -38,15 +38,17 @@ int main(int argc, char** argv)
     frame_param.detector_type = "SIFT";
 
     fileSource source("../data");
-    source.depth_dir = "/home/jyi/Data/rgbd_slam/depth_png";
+//    source.depth_dir = "/home/jyi/Data/rgbd_slam/depth_png";
+//    source.rgb_dir = "/home/jyi/Data/rgbd_slam/rgb_png";
+    source.depth_dir = "../data/depth_png";
+    source.rgb_dir = "../data/rgb_png";
     source.depth_marker = "";
     source.depth_extension = ".png";
-    source.rgb_dir = "/home/jyi/Data/rgbd_slam/rgb_png";
     source.rgb_marker = "";
     source.rgb_extension = ".png";
     source.setCamera(camera);
-    source.setStartIndex(100);
-    source.setEndIndex(300);
+    source.setStartIndex(150);
+    source.setEndIndex(250);
 
     visualOdometry vo;
     vo.setImageSource(&source);

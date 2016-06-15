@@ -19,4 +19,9 @@ void fusingPointCloud(PointCloudT &in_base,
                       PointCloudT &output,
                       Eigen::Affine3f &transformation);
 
+void refinePoseAndFusingPointCloud(PointCloudT &base,
+                                   PointCloudT &addition,
+                                   Eigen::Affine3f &camera_pose,
+                                   Eigen::Affine3f &pose_increment);
+
 #endif // POINTCLOUDFUSION_H
