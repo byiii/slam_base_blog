@@ -83,5 +83,5 @@ void refinePoseAndFusingPointCloud(PointCloudT &base,
         PCL_ERROR ("\nICP has not converged.\n");
     }
     camera_pose = camera_pose * pose_increment;
-    fusingPointCloud(base, addition, camera_pose);
+    //fusingPointCloud(base, addition, camera_pose);
 }

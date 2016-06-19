@@ -15,7 +15,6 @@ g2o_solver_csparse
 g2o_solver_dense
 g2o_solver_eigen
 g2o_solver_pcg
-g2o_solver_slam2d_linear
 g2o_solver_structure_only
 g2o_stuff
 g2o_types_data

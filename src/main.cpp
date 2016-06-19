@@ -54,7 +54,7 @@ int main(int argc, char** argv)
     vo.setImageSource(&source);
     vo.setCamera(camera);
 
-    vo.run();
+    vo.run_with_g2o();
 }
 
 //int main(int argc, char** argv)
