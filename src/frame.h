@@ -86,6 +86,10 @@ public:
     {
         return this->pointCloud->makeShared();
     }
+    camera_intrinsic_parameters getCamera()
+    {
+        return this->camera;
+    }
 
     friend void estimateMotion_3dTo2d(frame &frame1,
                                       frame &frame2,

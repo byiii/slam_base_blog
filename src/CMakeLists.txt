@@ -43,6 +43,7 @@ ${G2O_LIBS}
 
 
 set(SLAM_BASE_FILES slambase.cpp
+                    loopClosure.cpp
                     axis_angle.cpp
                     axis_angle.hpp
                     rgbdSource.cpp
